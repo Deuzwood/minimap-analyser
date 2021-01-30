@@ -1,0 +1,25 @@
+#Riot Games API file
+dragontail-*
+
+*.h5
+*.weights
+
+#Python file
+__pycache__
+*.py[cod]
+
+# File generated with 1_Init
+data_classes.txt
+Data/Source_Images/Training_Images/*
+res
+
+# Environments
+.env
+env/
+
+# vscode
+.vscode
+vscode
+
+# Results
+*result*.png
