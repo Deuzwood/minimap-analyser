@@ -1,10 +1,23 @@
 class Champion:
+    def __init__(self, data):
+        [xmin, ymin, xmax, ymax, idChamp] = data
+        self.xmin = int(xmin)
+        self.ymin = int(ymin)
+        self.xmax = int(xmax)
+        self.ymax = int(ymax)
 
-    def __init__(self,id, confidence, xmin, ymin, xmax, ymax):
-        self.data = []
-        self.id = id
-        self.confidence = confidence
-        self.center = self.getCenter(xmin, ymin, xmax, ymax)
+        self.idChampion = int(idChamp)
 
-    def getCenter(self, xmin, ymin, xmax, ymax):
-        return ( (xmin+xmax)/2, (ymin+ymax)/2 )
+    def getCenter(self):
+        return ((self.xmin + self.xmax) / 2, (self.ymin + self.ymax) / 2)
+
+    def toString(self):
+        return (
+            str(self.idChampion)
+            + "("
+            + str(self.xmin)
+            + ","
+            + str(self.ymin)
+            + ") "
+            + str(self.getCenter())
+        )

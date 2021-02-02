@@ -14,3 +14,5 @@ create fake map :
 given two function x,y
 given one champ a
 `a[x=1,y=0]`
+
+without blue and red circle confidence near of 100% without superposiion
