@@ -20,7 +20,7 @@ mapIndex = 0
 _list = []
 _listBis = []
 
-with open('dataDragon/10.23.1/data/fr_FR/champion.json', 'r') as json_file:
+with open('./../dragontail-11.2.1/11.2.1/data/fr_FR/champion.json', 'r') as json_file:
     data = json.load(json_file)
     data = data['data']
     
