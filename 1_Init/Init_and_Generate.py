@@ -125,7 +125,7 @@ if __name__ == "__main__":
     for mapIndex in range(FLAGS.number):
         rift = Image.open(rift_file)
         randomList = random.sample(list(_list), nbChampionsPerMap)
-        row = "map" + str(mapIndex) + ".jpg"
+        row = training_images_path+"/map" + str(mapIndex) + ".jpg"
         lastRed = (-1, -1)
         lastBlue = (-1, -1)
         for randomChampIndex in randomList:
