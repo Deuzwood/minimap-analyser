@@ -24,4 +24,5 @@ comparison = data == datam
 equal_arrays = comparison.all()
 print(equal_arrays)
 
-print(match)
+print(match) 
+# one solutions : circle champs on map into array to compare with real champs.
