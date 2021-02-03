@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     # PARAMS
 
-    nbChampionsPerMap = 300
+    nbChampionsPerMap = 10
     red = Image.open(red_file)
     blue = Image.open(blue_file)
     yuumi_red = Image.open(yuumi_red_file)
