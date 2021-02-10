@@ -210,7 +210,7 @@ def generateMaps(nbMaps):
 
 
 
-generateMaps(32)
+generateMaps(3200)
 print(listTest)
 
 
