@@ -130,7 +130,7 @@ for lineNumber in range(0, 20):
         for i in range(0, lineNumber + 1):
             real = data.readline()
 
-    real = real.replace("map" + str(lineNumber) + ".jpg ", "")
+    real = real.replace("C:\\Users\\nicol\\Documents\\minimap-analyser\\Data\\Source_Images\\Training_Images/map" + str(lineNumber) + ".jpg ", "")
     real = real.split(" ")
     for s in real:
         s = s.split(",")
