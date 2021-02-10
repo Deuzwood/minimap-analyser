@@ -27,11 +27,6 @@ yuumi_red_file = os.path.join(init_images_path,"yuumi_red.png")
 data_classes_file = os.path.join(model_weights,"data_classes.txt")
 data_train_file = os.path.join(training_images_path,"data_train.txt")
 
-
-
-
-
-
 sys.path.append(const_path)
 
 import argparse
