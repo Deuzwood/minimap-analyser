@@ -41,6 +41,10 @@ image_test_folder = os.path.join(image_folder, "Test_Images")
 
 detection_results_folder = os.path.join(image_folder, "Test_Image_Detection_Results")
 detection_results_file = os.path.join(detection_results_folder, "Detection_Results.csv")
+detection_video_results_file = os.path.join(
+    detection_results_folder, "Detection_Video_Results.csv"
+)
+
 
 model_folder = os.path.join(data_folder, "Model_Weights")
 
@@ -132,6 +136,14 @@ if __name__ == "__main__":
         default=detection_results_file,
         help="File to save bounding box results to. Default is "
         + detection_results_file,
+    )
+    parser.add_argument(
+        "--box_video_file",
+        type=str,
+        dest="videobox",
+        default=detection_video_results_file,
+        help="File to save bounding box results to. Default is "
+        + detection_video_results_file,
     )
 
     parser.add_argument(
@@ -289,20 +301,37 @@ if __name__ == "__main__":
                 [os.path.basename(f) for f in input_video_paths[:5]],
             )
         )
+        out_df = pd.DataFrame(
+            columns=["xmin", "ymin", "xmax", "ymax", "label", "confidence"]
+        )
         start = timer()
         for i, vid_path in enumerate(input_video_paths):
             output_path = os.path.join(
                 FLAGS.output,
                 os.path.basename(vid_path).replace(".", FLAGS.postfix + "."),
             )
-            detect_video(yolo, vid_path, output_path=output_path)
-
+            prediction = detect_video(yolo, vid_path, output_path=output_path)
+            for single_prediction in prediction:
+                out_df = out_df.append(
+                    pd.DataFrame(
+                        [single_prediction],
+                        columns=[
+                            "xmin",
+                            "ymin",
+                            "xmax",
+                            "ymax",
+                            "label",
+                            "confidence",
+                        ],
+                    )
+                )
         end = timer()
         print(
             "Processed {} videos in {:.1f}sec".format(
                 len(input_video_paths), end - start
             )
         )
+        out_df.to_csv(FLAGS.videobox, index=False)
     # for Webcam
     if webcam_active:
         start = timer()

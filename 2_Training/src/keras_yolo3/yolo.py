@@ -250,6 +250,7 @@ def detect_video(yolo, video_path, output_path=""):
     curr_fps = 0
     fps = "FPS: ??"
     prev_time = timer()
+    r = []
     while vid.isOpened():
         return_value, frame = vid.read()
         if not return_value:
@@ -258,6 +259,7 @@ def detect_video(yolo, video_path, output_path=""):
         frame = frame[:, :, ::-1]
         image = Image.fromarray(frame)
         out_pred, image = yolo.detect_image(image, show_stats=False)
+        r = r + out_pred + [[0, 0, 0, 0, 0, -1]]
         result = np.asarray(image)
         curr_time = timer()
         exec_time = curr_time - prev_time
@@ -285,6 +287,7 @@ def detect_video(yolo, video_path, output_path=""):
         #     break
     vid.release()
     out.release()
+    return r
     # yolo.close_session()
 
 
