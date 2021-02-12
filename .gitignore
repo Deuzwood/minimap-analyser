@@ -13,6 +13,9 @@ data_classes.txt
 Data/Source_Images/Training_Images/*
 res
 
+# 0_Light
+0_Light/Data/Training/*.jpg
+
 # Environments
 .env
 env/
@@ -22,4 +25,5 @@ env/
 vscode
 
 # Results
-*result*.png
+*result*.*
+*.mp4
