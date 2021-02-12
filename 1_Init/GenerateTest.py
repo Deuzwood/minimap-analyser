@@ -137,7 +137,7 @@ if __name__ == "__main__":
         )
         text.append(row)
 
-    def generateMapSuperposition(mapIndex,startIndex,redOrBlue,xPos,yPos,xMove,yMove):
+    def generateMapSuperposition(mapIndex,startIndex,redOrBlue,xPos,yPos,xDir,yDir):
         rift = Image.open(rift_file)
         row = training_images_path+"/map" + str(mapIndex) + ".jpg"
         x = xPos
@@ -149,9 +149,15 @@ if __name__ == "__main__":
             random_image_file = os.path.join(res_path,(_list[randomIndexList[startIndex+i]] + ".png"))
             listTest[randomIndexList[startIndex+i]]+=1
             randomChampImage = Image.open(random_image_file)
+
+            while(True):
+                xMove = math.floor(random.uniform(0,22))
+                yMove = math.floor(random.uniform(0,22))
+                if (xMove + yMove > 17):
+                    break
             
-            x += math.floor(random.uniform(0.2,1)*26) * xMove
-            y += math.floor(random.uniform(0.2,1)*26) * yMove
+            x += xMove * xDir
+            y += yMove * yDir
             rift.paste(randomChampImage, (x, y), randomChampImage)
             if ((i+redOrBlue)%2==0):
                 rift.paste(red, (x, y), red)
@@ -179,27 +185,23 @@ if __name__ == "__main__":
 
 def generateMaps(nbMaps):
     mapIndex = 0
-    while (mapIndex < nbMaps/2):
-        random.shuffle(randomIndexList)
-        listIndex = 0
-        while (listIndex < nbChampions):
-            # red
-            generateMapSuperposition(mapIndex, listIndex, 0, 10,10,1,1)
-            mapIndex += 1
-            # blue
-            generateMapSuperposition(mapIndex, listIndex, 1, 10, 200, 1, -1)
-            mapIndex += 1
-            listIndex += nbChampionsPerMap
     while (mapIndex < nbMaps):
         random.shuffle(randomIndexList)
         listIndex = 0
         while (listIndex < nbChampions):
             # red
+            generateMapSuperposition(mapIndex, listIndex, 0, 10, 10, 1, 1)
+            mapIndex += 1
+            # blue
+            generateMapSuperposition(mapIndex, listIndex, 1, 10, 200, 1, -1)
+            mapIndex += 1
+
             generateMap(mapIndex, listIndex, 0)
             mapIndex += 1
             # blue
             generateMap(mapIndex, listIndex, 1)
             mapIndex += 1
+
             listIndex += nbChampionsPerMap
 
 
@@ -209,7 +211,7 @@ def generateMaps(nbMaps):
 
 
 
-
+# multiple de 64 si possible
 generateMaps(FLAGS.number)
 print(listTest)
 
