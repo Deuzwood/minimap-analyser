@@ -27,3 +27,7 @@ vscode
 # Results
 *result*.*
 *.mp4
+
+# Checkpoints
+Checkpoints
+*.ckpt.*
