@@ -39,7 +39,7 @@ async function init(){
             if(champions.frame >= lastFrame){
                 var img = new Image();
                 await new Promise(r => img.onload=r, img.src='/data/res/'+champions.name+'.png');
-                ctx.drawImage(img, champions.center.x, champions.center.y);
+                ctx.drawImage(img, parseInt(champions.xmin), parseInt(champions.ymin));
             }
             
             displayStats()
@@ -54,7 +54,10 @@ async function displayStats(){
     const championsLineStatsCode = (name, data) => `<tr>
     <td>${name}</td>
     <td>${data.detected}</td>
-    <td><button class="btn btn-secondary btn-small" data-action="btnPath" data-name="${name}">See path</button></td>
+    <td>
+        <button class="btn btn-secondary btn-small" data-action="btnPath" data-name="${name}">See path</button>
+        <button class="btn btn-warning btn-small" data-action="btnCompare" data-name="${name}">+</button>
+    </td>
   </tr>` 
   statsTableBody.innerHTML = ''
     for (const [key, value] of Object.entries(stats)) {
@@ -71,6 +74,11 @@ async function displayStats(){
         })
     })
       
+    document.querySelectorAll('button[data-action="btnCompare"]').forEach( async element => {
+        element.addEventListener('click', async event => {
+            await renderPath(element.getAttribute('data-name'))
+        })
+    })
 }
 
 async function renderNew(){
@@ -99,12 +107,11 @@ async function renderPath(champ){
 
             if(firstTime){
                 ctx.moveTo( champions.center.x, champions.center.y)
-                console.log("here");
                 firstTime = false
             }else{
-                console.log("then here");
-                last = champions.center
-                ctx.lineTo( champions.center.x, champions.center.y)
+                console.log(parseInt(champions.ymin))
+                last = { x : parseInt(champions.xmin) , y : parseInt(champions.ymin) }
+                ctx.lineTo( parseInt(champions.center.x), parseInt(champions.center.y))
             }
 
         }

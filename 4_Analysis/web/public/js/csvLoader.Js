@@ -34,8 +34,8 @@ async function csvLoader(file) {
         });
         obj.frame = indexFrame
         obj.center = {
-            x :  (parseFloat(obj.xmin) + parseFloat(obj.xmax) /2),
-            y : (parseFloat(obj.ymin) + parseFloat(obj.ymax) /2)
+            x :  ( (parseInt(obj.xmin) + parseInt(obj.xmax)) /2),
+            y : ( (parseInt(obj.ymin) + parseInt(obj.ymax)) /2)
         }
         obj.name = classes[parseInt(obj.label)]
     
