@@ -1,4 +1,3 @@
-"use strict"
 
 async function load(file) {
     var xhr = new XMLHttpRequest();
@@ -17,7 +16,7 @@ async function load(file) {
     });
 }
 
-export async function csvLoader(file) {
+async function csvLoader(file) {
     let csv = []
     let data = await load(file)
     let classes = await load('data/data_classes.txt')
