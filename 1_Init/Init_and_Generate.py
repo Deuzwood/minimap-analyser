@@ -10,23 +10,10 @@ def get_parent_dir(n=1):
         current_path = os.path.dirname(current_path)
     return current_path
 
+
+
 racine_path = get_parent_dir(1)
 const_path = os.path.join(racine_path, "Const")
-data_path = os.path.join(racine_path,"Data")
-res_path = os.path.join(racine_path,"res")
-init_images_path = os.path.join(data_path,"Source_Images","Init_Images")
-training_images_path = os.path.join(data_path,"Source_Images","Training_Images")
-model_weights = os.path.join(data_path,"Model_Weights")
-
-
-blue_file = os.path.join(init_images_path,"blue.png")
-red_file = os.path.join(init_images_path,"red.png")
-rift_file = os.path.join(init_images_path,"rift.png")
-yuumi_blue_file = os.path.join(init_images_path,"yuumi_blue.png")
-yuumi_red_file = os.path.join(init_images_path,"yuumi_red.png")
-data_classes_file = os.path.join(model_weights,"data_classes.txt")
-data_train_file = os.path.join(training_images_path,"data_train.txt")
-
 sys.path.append(const_path)
 
 import argparse
@@ -36,6 +23,7 @@ import json
 import const
 import random
 
+print(racine_path)
 champions_list_path = os.path.join(racine_path, const.CHAMPIONS_LIST_PATH)
 champions_tile_path = os.path.join(racine_path, const.CHAMPIONS_TILE_PATH)
 
@@ -60,11 +48,11 @@ if __name__ == "__main__":
     FLAGS = parser.parse_args()
 
     # Create 26*26 tile for all champs
-    with open(champions_list_path, "r") as json_file:
+    with open(const.champions_list_file, "r") as json_file:
         data = json.load(json_file)
         data = data["data"]
         for p in data:
-            p_file = os.path.join(champions_tile_path, (p+".png"))
+            p_file = os.path.join(const.champions_img_path, (p+".png"))
             img = Image.open(p_file).convert("RGB")
             npImage = np.array(img)
             h, w = img.size
@@ -83,16 +71,16 @@ if __name__ == "__main__":
             # Save with alpha / 26*26 resize
             output = Image.fromarray(npImage)
             output = output.resize((26, 26), 4)
-            save_file = os.path.join(res_path,(p+".png"))
+            save_file = os.path.join(const.res_path,(p+".png"))
             output.save(save_file)
 
     # PARAMS
 
     nbChampionsPerMap = 10
-    red = Image.open(red_file)
-    blue = Image.open(blue_file)
-    yuumi_red = Image.open(yuumi_red_file)
-    yuumi_blue = Image.open(yuumi_blue_file)
+    red = Image.open(const.red_file)
+    blue = Image.open(const.blue_file)
+    yuumi_red = Image.open(const.yuumi_red_file)
+    yuumi_blue = Image.open(const.yuumi_blue_file)
 
     _list = {}
 
@@ -110,7 +98,7 @@ if __name__ == "__main__":
         print("Number of champions : " + str(len(_list)))
         # print("Champion aux hasard : "+_list[random.randint(0,len(_list))])
 
-        f = open(model_weights+"/data_classes.txt", "w")
+        f = open(const.data_classes_file, "w")
         f.write("\n".join(data_classes))
         f.close()
 
@@ -118,13 +106,15 @@ if __name__ == "__main__":
     redBool = True
 
     for mapIndex in range(FLAGS.number):
-        rift = Image.open(rift_file)
+        rift = Image.open(const.rift_file)
         randomList = random.sample(list(_list), nbChampionsPerMap)
-        row = training_images_path+"/map" + str(mapIndex) + ".jpg"
+        imgName = "map"+str(mapIndex)+".jpg"
+
+        row = os.path.join(const.training_images_path,imgName)
         lastRed = (-1, -1)
         lastBlue = (-1, -1)
         for randomChampIndex in randomList:
-            random_image_file = os.path.join(res_path,(_list[randomChampIndex] + ".png"))
+            random_image_file = os.path.join(const.res_path,(_list[randomChampIndex] + ".png"))
             randomChampImage = Image.open(random_image_file)
             x = random.randint(10, 226)
             y = random.randint(10, 226)
@@ -170,14 +160,14 @@ if __name__ == "__main__":
             )
 
         out = rift.convert("RGB")
-        out_file = os.path.join(training_images_path,"map"+str(mapIndex)+".jpg")
+        out_file = os.path.join(const.training_images_path,imgName)
         out.save(
             out_file,
             quality=90,
         )
         text.append(row)
 
-    f = open(training_images_path+"/data_train.txt", "w")
+    f = open(const.data_train_file, "w")
     f.write("\n".join(text))
     f.close()
     print("Generated", FLAGS.number, "maps")

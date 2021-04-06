@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+racine_path = get_parent_dir(1)
+const_path = os.path.join(racine_path, "Const")
+sys.path.append(const_path)
+
+import const
 from PIL import Image
 import json
 import random
@@ -11,16 +16,15 @@ def isPosValid(x,y,a,b,c,d):
 #PARAMS
 nbGeneratedMap = 10
 nbChampionsPerMap = 10
-trainingImagePath = '/content/TrainYourOwnYOLO/Data/Source_Images_Training_Images/vott-csv-export/'
 nbChampions = 0
 text = []
-red = Image.open('./rift/red.png')
-blue = Image.open('./rift/blue.png')
+red = Image.open(const.red_file)
+blue = Image.open(const.blue_file)
 mapIndex = 0
 _list = []
 _listBis = []
 
-with open('./../dragontail-11.2.1/11.2.1/data/fr_FR/champion.json', 'r') as json_file:
+with open(const.champions_list_file, 'r') as json_file:
     data = json.load(json_file)
     data = data['data']
     
