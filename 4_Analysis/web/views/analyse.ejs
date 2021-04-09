@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimap Analyser</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>Minimap Analyser - <%= data %></h1>
+    <div class="row">
+        <div class="col">
+
+            <button class="btn btn-info" id="btnMap" data-style="default">Change map</button>
+            <br>
+            <div height="256px" class="position-relative">
+                <canvas class="position-absolute" id="rift" width="256" height="256">
+                    <p>html5 canvas not supported :/</p>
+                </canvas>    
+                
+                <canvas class="position-absolute" id="gradient" width="256" height="256">
+                    <p>html5 canvas not supported :/</p>
+                </canvas>  
+                
+                <canvas class="d-hidden" width="256" height="256">
+                    <p>html5 canvas not supported :/</p>
+                </canvas>    
+            </div>
+            <input type="range" id="frameInput" name="frameInput" min="0" max="500" data-bs-toggle="tooltip" data-bs-placement="bottom" title="...">
+        </div>
+
+        <div class="col">
+            <section id="statsSection">
+                <h3>Stats</h3>
+                <div class="row">
+                    <div class="col"> <table class="table table-hover">
+                        <thead class="text-center">
+                            <tr>
+                                <th colspan="2">Blue Team</th>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbblue">
+                            <tr>
+                            </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="col">
+                        <table class="table table-hover">
+                            <thead class="text-center">
+                                <tr>
+                                    <th colspan="2">Red Team
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbred">
+                                <tr>
+                                </tr>
+                            </tbody>
+                          </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+   
+</body>
+<script>const fileToLoadName = "<%= data %>"</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+<script>
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+    </script>
+
+<script src="/js/csvLoaders.js"></script>
+<script src="/js/javascript.js"></script>
+</html>
