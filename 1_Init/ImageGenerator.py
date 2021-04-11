@@ -20,6 +20,8 @@ class ImageGenerator:
         self.nbMapsToGenerate = 10
         self.mapIndex = 0
 
+        self.yuumiProba = 200
+
         self.nbChampionsPerMap = 10
         self.nbChampions = 0
         self.championIndex = 0
@@ -30,6 +32,7 @@ class ImageGenerator:
         self.maxLimit = self.imageSize - 3*self.championSize/2
 
         self.data_train = []
+        
 
         self.redImage = Image.open(const.red_file)
         self.blueImage = Image.open(const.blue_file)
@@ -58,6 +61,7 @@ class ImageGenerator:
             f.write('\n'.join(data_classes))
             f.close()
             self.randomIndexList = list(range(self.nbChampions))
+            self.listTest = [0]*self.nbChampions
     #random.shuffle(randomIndexList)
 
     #def randomXY(limit):
@@ -74,6 +78,9 @@ class ImageGenerator:
 
     def championToString(self,i,x,y):
         return " "+str(x)+","+str(y)+","+str(x+self.championSize)+","+str(y+self.championSize)+","+str(self.getRandomChampionIndex(i))
+    
+    def yuumiToString(self,x,y):
+        return " "+str(x)+","+str(y)+","+str(x+36)+","+str(y+36)+","+str(self.championsList.index("Yuumi"))
 
     def getValidRandomPosition(self):
         return random.randint(self.minLimit,self.maxLimit),random.randint(self.minLimit,self.maxLimit)
@@ -88,8 +95,9 @@ class ImageGenerator:
         for i in range(self.nbChampionsPerMap):
             if (self.championIndex + i >= self.nbChampions):
                 break
-
+            
             randomChampion = self.getRandomChampion(i)
+            self.listTest[self.championsList.index(randomChampion)] += 1
             randomChampionFile = os.path.join(const.res_path,(randomChampion+ ".png"))
             randomChampionImage = Image.open(randomChampionFile)
             
@@ -97,10 +105,20 @@ class ImageGenerator:
 
             rift.paste(randomChampionImage, (x, y), randomChampionImage)
 
-            if ((i+redOrBlue)%2==0):
-                rift.paste(self.redImage, (x, y), self.redImage)
-            else :
-                rift.paste(self.blueImage, (x, y), self.blueImage)
+            if (random.randint(0,self.yuumiProba) == 0):
+                x -= 1
+                y -= 5
+                if ((i+redOrBlue)%2==0):
+                    rift.paste(self.yuumi_red, (x, y), self.yuumi_red)
+                else :
+                    rift.paste(self.yuumi_blue, (x, y), self.yuumi_blue)
+                row += self.yuumiToString(x,y)
+            else : 
+                if ((i+redOrBlue)%2==0):
+                    rift.paste(self.redImage, (x, y), self.redImage)
+                else :
+                    rift.paste(self.blueImage, (x, y), self.blueImage)
+            
 
             row += self.championToString(i,x,y)
         out = rift.convert("RGB")
@@ -150,6 +168,7 @@ class ImageGenerator:
                 break
 
             randomChampion = self.getRandomChampion(i)
+            self.listTest[self.championsList.index(randomChampion)] += 1
             randomChampionFile = os.path.join(const.res_path,(randomChampion+ ".png"))
             randomChampionImage = Image.open(randomChampionFile)
             
@@ -157,10 +176,19 @@ class ImageGenerator:
 
             rift.paste(randomChampionImage, (x, y), randomChampionImage)
 
-            if ((i+redOrBlue)%2==0):
-                rift.paste(self.redImage, (x, y), self.redImage)
-            else :
-                rift.paste(self.blueImage, (x, y), self.blueImage)
+            if (random.randint(0,self.yuumiProba) == 0):
+                x -= 1
+                y -= 5
+                if ((i+redOrBlue)%2==0):
+                    rift.paste(self.yuumi_red, (x, y), self.yuumi_red)
+                else :
+                    rift.paste(self.yuumi_blue, (x, y), self.yuumi_blue)
+                row += self.yuumiToString(x,y)
+            else : 
+                if ((i+redOrBlue)%2==0):
+                    rift.paste(self.redImage, (x, y), self.redImage)
+                else :
+                    rift.paste(self.blueImage, (x, y), self.blueImage)
 
             row += self.championToString(i,x,y)
 
@@ -195,6 +223,7 @@ class ImageGenerator:
             self.generateMapSuperposition(1)
             self.updateChampions()
         self.updateDataTrain()
+        print(self.listTest)
 
 if __name__ == "__main__":
     # Delete all default flags
