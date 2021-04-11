@@ -18,10 +18,15 @@ async function load(file) {
 async function csvLoader(file) {
     let csv = [];
     let data = await load(file);
-    let classes = await load('data/data_classes.txt');
+    let classes = await load('/data/data_classes.txt');
     classes = classes.split('\r\n');
     data = data.split('\r\n');
     let header = data.shift();
+
+    if (data[data.length - 1].length == 0) {
+        data.pop();
+    }
+
     header = header.split(',');
     let indexFrame = 0;
     for (let index = 0; index < data.length; index++) {
@@ -37,8 +42,9 @@ async function csvLoader(file) {
         };
         obj.name = classes[parseInt(obj.label)];
 
-        if (parseInt(obj.confidence) != -1) csv.push(obj);
-        else {
+        if (parseInt(obj.confidence) != -1) {
+            csv.push(obj);
+        } else {
             indexFrame++;
         }
     }

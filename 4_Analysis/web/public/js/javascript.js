@@ -5,72 +5,111 @@
         - res folder (26*26 champions tiles) , 
         - Detection_Video_Results.csv from inference
 */
+let greyRiftEquivalence = {
+    0: 'bluebase',
+    93: 'Red Jungle',
+    130: 'Top Lane',
+    145: 'Mid Lane',
+    155: 'Bottom Lane',
+    187: 'Blue Jungle',
+    221: 'River',
+    255: 'redbase',
+};
 
 let data = '';
 let stats = {};
+let RED_TEAM = [];
+let BLUE_TEAM = [];
 let mapStyle = 'default';
-
-let mapStyleName = {
-    default: 'rift',
-    replay: 'replayRift',
-};
 
 async function init() {
     try {
-        data = await csvLoader('data/Detection_Video.csv');
-        stats = {};
+        data = await csvLoader(
+            '/data/' + fileToLoadName + '.csv' ||
+                '/data/Detection_Video_Results_full.csv'
+        );
+
+        stats = await fetch('/data/' + fileToLoadName + '-stats.json');
+        stats = await stats.json();
+
         const canvas = document.querySelector('#rift');
         const ctx = canvas.getContext('2d');
-        let lastFrame = 0;
+
+        //change max of FrameInptu
+        frameInput.setAttribute('max', countFrame());
+
+        for (const property in stats) {
+            if (stats[property].team == 0) {
+                BLUE_TEAM.push(stats[property]);
+            } else {
+                RED_TEAM.push(stats[property]);
+            }
+        }
 
         var img = new Image();
         await new Promise(
             (r) => (img.onload = r),
-            (img.src = '/data/minimap/' + mapStyleName[mapStyle] + '.png')
+            (img.src = '/data/minimap/rift.png')
         );
         ctx.drawImage(img, 0, 0, 256, 256);
 
-        for (let index = 0; index < data.length; index++) {
-            const champions = data[index];
-
-            if (stats[[champions.name]] === undefined) {
-                stats[[champions.name]] = { detected: 0 };
-            }
-            stats[[champions.name]].detected += 1;
-
-            if (champions.frame >= lastFrame) {
-                var img = new Image();
-                await new Promise(
-                    (r) => (img.onload = r),
-                    (img.src = '/data/tiles/' + champions.name + '.png')
-                );
-                ctx.drawImage(
-                    img,
-                    parseInt(champions.xmin),
-                    parseInt(champions.ymin)
-                );
-            }
-
-            displayStats();
-        }
+        await displayStats();
     } catch (err) {
         console.log(err);
     }
 }
 
+function buildCleanBoard() {
+    const blueLine = (name, position) => `
+    <td width="10%"><img src="/data/tiles/${name}.png"></td>
+    <td>${position}</td>
+    `;
+
+    const redLine = (name, position) => `
+    <td>${position}</td>
+    <td width="10%"><img src="/data/tiles/${name}.png"></td>
+    `;
+
+    for (i = 0; i < 5; i++)
+        for (let index = 0; index < 5; index++) {
+            tb.innerHTML += line(blueLine(BLUE_TEAM[i]), redLine(RED_TEAM[i]));
+        }
+}
+
+function countFrame() {
+    return data[data.length - 1].frame;
+}
+
+function renderGradient(name) {
+    init_grid();
+    for (let i = 0; i < data.length - 1; i++) {
+        if (data[i].name == name) {
+            add_point(parseInt(data[i].center.x), parseInt(data[i].center.y));
+        }
+    }
+    render_grid();
+}
+
 async function displayStats() {
-    const championsLineStatsCode = (name, data) => `<tr>
-    <td>${name}</td>
-    <td>${data.detected}</td>
+    const championsLineStatsCode = (stats) => `<tr>
+    <td width="10%"><img src="/data/tiles/${stats.name}.png"></td>
+    <td width="10%">${stats.mainPosition}</td>
     <td>
-        <button class="btn btn-secondary btn-small" data-action="btnPath" data-name="${name}">See path</button>
-        <button class="btn btn-warning btn-small" data-action="btnCompare" data-name="${name}">+</button>
+        <button class="btn btn-outline-secondary btn-small" data-action="btnPath" data-name="${stats.name}"><i class="bi bi-geo-alt-fill"></i></button>
+        <button class="btn btn-outline-success btn-small" data-action="btnCompare" data-name="${stats.name}"><i class="bi bi-plus"></i></button>
+        <button class="btn btn-outline-warning btn-small" data-action="btnHeatMap" data-name="${stats.name}"><i class="bi bi-thermometer-high"></i></button>
     </td>
   </tr>`;
-    statsTableBody.innerHTML = '';
-    for (const [key, value] of Object.entries(stats)) {
-        if (value.detected > 20) {
-            statsTableBody.innerHTML += championsLineStatsCode(key, value);
+
+    tbblue.innerHTML = '';
+    tbred.innerHTML = '';
+
+    for (const property in stats) {
+        console.log(stats[property]);
+        if (stats[property].team == 0) {
+            tbblue.innerHTML += championsLineStatsCode(stats[property]);
+        } else {
+            tbred.innerHTML += championsLineStatsCode(stats[property]);
         }
     }
 
@@ -90,6 +129,14 @@ async function displayStats() {
                 await renderPath(element.getAttribute('data-name'));
             });
         });
+
+    document
+        .querySelectorAll('button[data-action="btnHeatMap"]')
+        .forEach((element) => {
+            element.addEventListener('click', async (event) => {
+                renderGradient(element.getAttribute('data-name'));
+            });
+        });
 }
 
 async function renderNew() {
@@ -99,7 +146,7 @@ async function renderNew() {
     var img = new Image();
     await new Promise(
         (r) => (img.onload = r),
-        (img.src = '/data/minimap/' + mapStyleName[mapStyle] + '.png')
+        (img.src = '/data/minimap/rift.png')
     );
     ctx.drawImage(img, 0, 0, 256, 256);
 }
@@ -110,11 +157,13 @@ async function renderPath(champ) {
 
     ctx.beginPath();
     let firstTime = true;
+    let displayChampName = 'Annie';
+    let last = {};
 
     for (let index = 0; index < data.length; index++) {
         const champions = data[index];
 
-        if (champions.name == champ || parseInt(champions.label) == champ) {
+        if (champions.name == champ) {
             displayChampName = champions.name;
 
             if (firstTime) {
@@ -143,18 +192,63 @@ async function renderPath(champ) {
     ctx.stroke();
 }
 
-document.querySelector('#btnMap').addEventListener('click', (event) => {
-    if (
-        document.querySelector('#btnMap').getAttribute('data-style') ==
-        'default'
-    ) {
-        document.querySelector('#btnMap').setAttribute('data-style', 'replay');
-        mapStyle = 'replay';
-    } else {
-        document.querySelector('#btnMap').setAttribute('data-style', 'default');
-        mapStyle = 'default';
+init();
+
+/* range */
+
+frameInput.addEventListener('change', async (event) => {
+    await renderNew();
+    for (let index = 0; index < data.length; index++) {
+        const champions = data[index];
+        const canvas = document.querySelector('#rift');
+        const ctx = canvas.getContext('2d');
+
+        if (champions.frame == frameInput.value) {
+            var img = new Image();
+            await new Promise(
+                (r) => (img.onload = r),
+                (img.src = '/data/tiles/' + champions.name + '.png')
+            );
+            ctx.drawImage(
+                img,
+                parseInt(champions.xmin),
+                parseInt(champions.ymin)
+            );
+        }
     }
-    init();
 });
 
-init();
+var tooltip = new bootstrap.Tooltip(frameInput);
+
+frameInput.addEventListener('input', (event) => {
+    var title = fromFrameToTime(parseInt(frameInput.value));
+
+    frameInput.setAttribute('title', title);
+    tooltip._fixTitle();
+    tooltip.show();
+});
+
+/* range utils */
+
+function fromFrameToTime(frame) {
+    const FPS = 10; // TODO
+    return (frame / FPS).toString().toHHMMSS();
+}
+
+String.prototype.toHHMMSS = function () {
+    var sec_num = parseInt(this, 10);
+    var hours = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - hours * 3600) / 60);
+    var seconds = sec_num - hours * 3600 - minutes * 60;
+
+    if (hours < 10) {
+        hours = '0' + hours;
+    }
+    if (minutes < 10) {
+        minutes = '0' + minutes;
+    }
+    if (seconds < 10) {
+        seconds = '0' + seconds;
+    }
+    return hours + ':' + minutes + ':' + seconds;
+};
