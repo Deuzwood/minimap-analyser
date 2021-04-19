@@ -6,14 +6,14 @@
         - Detection_Video_Results.csv from inference
 */
 let greyRiftEquivalence = {
-    0: 'bluebase',
+    0: 'Red Base',
     93: 'Red Jungle',
     130: 'Top Lane',
     145: 'Mid Lane',
     155: 'Bottom Lane',
     187: 'Blue Jungle',
     221: 'River',
-    255: 'redbase',
+    255: 'Blue Base',
 };
 
 let data = '';
@@ -111,6 +111,7 @@ async function displayStats() {
         } else {
             tbred.innerHTML += championsLineStatsCode(stats[property]);
         }
+        addToChart(stats[property]);
     }
 
     document
@@ -139,6 +140,19 @@ async function displayStats() {
         });
 }
 
+async function getColor(name = 'Annie') {
+    var img = new Image();
+
+    await new Promise(
+        (r) => (img.onload = r),
+        (img.src = `/data/tiles/${name}.png`)
+    );
+
+    var colorThief = new ColorThief();
+    var color = colorThief.getColor(img);
+    return color;
+}
+
 async function renderNew() {
     const canvas = document.querySelector('#rift');
     const ctx = canvas.getContext('2d');
@@ -160,10 +174,17 @@ async function renderPath(champ) {
     let displayChampName = 'Annie';
     let last = {};
 
+    let clr = await getColor(champ);
+    let currentFrame = parseInt(frameInput.value);
+
     for (let index = 0; index < data.length; index++) {
         const champions = data[index];
 
-        if (champions.name == champ) {
+        if (
+            champions.name == champ &&
+            champions.frame <= currentFrame &&
+            champions.frame > currentFrame - 10 * 60
+        ) {
             displayChampName = champions.name;
 
             if (firstTime) {
@@ -181,15 +202,43 @@ async function renderPath(champ) {
             }
         }
     }
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = `rgb(${clr})`;
+    ctx.stroke();
+
     var img = new Image();
     await new Promise(
         (r) => (img.onload = r),
         (img.src = '/data/tiles/' + displayChampName + '.png')
     );
     ctx.drawImage(img, last.x, last.y);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#00ff00';
-    ctx.stroke();
+}
+
+function positionToRepartition(obj) {
+    let sum = 0;
+    for (const property in obj.position) {
+        sum += obj.position[property];
+    }
+
+    obj.positionRepartition = {
+        'Red Base': 0,
+        'Red Jungle': 0,
+        'Top Lane': 0,
+        'Mid Lane': 0,
+        'Bottom Lane': 0,
+        'Blue Jungle': 0,
+        River: 0,
+        'Blue Base': 0,
+    };
+    percent = [];
+    for (const property in obj.position) {
+        percent.push(obj.position[property] / sum);
+    }
+    let index = 0;
+    for (const property in obj.positionRepartition) {
+        obj.positionRepartition[property] = percent[index];
+        index++;
+    }
 }
 
 init();
@@ -252,3 +301,55 @@ String.prototype.toHHMMSS = function () {
     }
     return hours + ':' + minutes + ':' + seconds;
 };
+
+var chartData = {
+    labels: [
+        'Red Base',
+        'Red Jungle',
+        'Top Lane',
+        'Mid Lane',
+        'Bottom Lane',
+        'Blue Jungle',
+        'River',
+        'Blue Base',
+    ],
+    datasets: [],
+};
+
+var ctx = document.getElementById('myChart');
+var myChart = new Chart(ctx, {
+    type: 'radar',
+    data: chartData,
+    options: {
+        elements: {
+            line: {
+                borderWidth: 3,
+            },
+        },
+    },
+});
+
+async function addToChart(champ) {
+    positionToRepartition(champ);
+    let arr = [];
+    for (const property in champ.positionRepartition) {
+        arr.push(champ.positionRepartition[property]);
+    }
+    console.log(arr);
+    let clr = await getColor(champ.name);
+    let strClr = `rgb(${clr})`;
+    let strClra = `rgb(${clr},0.2)`;
+    chartData.datasets.push({
+        label: champ.name,
+        data: arr,
+        fill: true,
+        backgroundColor: strClra,
+        borderColor: strClr,
+        pointBackgroundColor: strClr,
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: strClr,
+        hidden: true,
+    });
+    myChart.update();
+}
