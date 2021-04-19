@@ -154,9 +154,6 @@ class ImageGenerator:
         print(str(self.mapIndex))
         return self.getValidRandomPosition()
         
-        
-
-
     def generateMapSuperposition(self,redOrBlue):
         rift = Image.open(const.rift_file)
         mapName = "map"+ str(self.mapIndex) +".jpg"
@@ -192,7 +189,7 @@ class ImageGenerator:
 
             row += self.championToString(i,x,y)
 
-            x,y = self.getNewPosition(x,y,sensX,sensY,10,self.championSize-5)
+            x,y = self.getNewPosition(x,y,sensX,sensY,5,self.championSize-5)
 
         out = rift.convert("RGB")
         out_file = os.path.join(const.training_images_path,mapName)
