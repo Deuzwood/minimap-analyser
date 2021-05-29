@@ -16,7 +16,7 @@ def get_parent_dir(n=1):
 # --------------------
 
 # League of Legends Version
-LATEST_VERSION = "11.7.1"
+LATEST_VERSION = "11.11.1"
 dragontail = "dragontail-" + LATEST_VERSION
 
 # GENERAL PATHS
@@ -25,7 +25,8 @@ const_path = os.path.join(racine_path, "Const")
 data_path = os.path.join(racine_path, "Data")
 res_path = os.path.join(racine_path, "res")
 init_images_path = os.path.join(data_path, "Source_Images", "Init_Images")
-training_images_path = os.path.join(data_path, "Source_Images", "Training_Images")
+training_images_path = os.path.join(
+    data_path, "Source_Images", "Training_Images")
 minimap_images_path = os.path.join(data_path, "Source_Images", "Minimap")
 model_weights_path = os.path.join(data_path, "Model_Weights")
 champions_img_path = os.path.join(
@@ -57,4 +58,5 @@ CHAMPIONS_LIST_PATH = os.path.join(
 )
 
 # Tile Path
-CHAMPIONS_TILE_PATH = os.path.join(dragontail, LATEST_VERSION, "img", "champion")
+CHAMPIONS_TILE_PATH = os.path.join(
+    dragontail, LATEST_VERSION, "img", "champion")
