@@ -1,16 +1,18 @@
-import path
+import argparse
+import json
+import math
+import os
+import random
 import sys
+
+from PIL import Image
+
+import path
 
 const = path.get_const_dir()
 sys.path.append(const)
 
-import argparse
 import const
-from PIL import Image
-import json
-import random
-import math
-import os
 
 
 class ImageGenerator:
@@ -124,7 +126,8 @@ class ImageGenerator:
 
             randomChampion = self.getRandomChampion(i)
             self.listTest[self.championsList.index(randomChampion)] += 1
-            randomChampionFile = os.path.join(const.res_path, (randomChampion + ".png"))
+            randomChampionFile = os.path.join(
+                const.res_path, (randomChampion + ".png"))
             randomChampionImage = Image.open(randomChampionFile)
 
             x, y = self.getValidRandomPosition()
@@ -178,8 +181,8 @@ class ImageGenerator:
             nbTry += 1
         print(str(self.mapIndex))
         return self.getValidRandomPosition()
-        
-    def generateMapSuperposition(self,redOrBlue):
+
+    def generateMapSuperposition(self, redOrBlue):
         rift = Image.open(const.rift_file)
         mapName = "map" + str(self.mapIndex) + ".jpg"
         row = os.path.join(const.training_images_path, mapName)
@@ -191,7 +194,8 @@ class ImageGenerator:
 
             randomChampion = self.getRandomChampion(i)
             self.listTest[self.championsList.index(randomChampion)] += 1
-            randomChampionFile = os.path.join(const.res_path, (randomChampion + ".png"))
+            randomChampionFile = os.path.join(
+                const.res_path, (randomChampion + ".png"))
             randomChampionImage = Image.open(randomChampionFile)
 
             rift.paste(randomChampionImage, (x, y), randomChampionImage)
@@ -212,7 +216,8 @@ class ImageGenerator:
 
             row += self.championToString(i, x, y)
 
-            x,y = self.getNewPosition(x,y,sensX,sensY,5,self.championSize-5)
+            x, y = self.getNewPosition(
+                x, y, sensX, sensY, 5, self.championSize-5)
 
         out = rift.convert("RGB")
         out_file = os.path.join(const.training_images_path, mapName)
@@ -234,13 +239,14 @@ class ImageGenerator:
         f.write("\n".join(self.data_train))
         f.close()
 
-    def generateMaps(self, nbMaps):
+    def generateMaps(self, nbMaps, superposition):
         while self.mapIndex < nbMaps:
             # redAndBlue
             self.generateMap(0)
             self.generateMap(1)
-            self.generateMapSuperposition(0)
-            self.generateMapSuperposition(1)
+            if(superposition):
+                self.generateMapSuperposition(0)
+                self.generateMapSuperposition(1)
             self.updateChampions()
         self.updateDataTrain()
         print(self.listTest)
@@ -260,7 +266,11 @@ if __name__ == "__main__":
         default=64,
         help="Number of fake map generated. Default is " + str(64),
     )
+    
+    parser.add_argument('--no_superposition', dest='superposition', action='store_false')
+    parser.set_defaults(superposition=True)
 
     FLAGS = parser.parse_args()
+    print(FLAGS)
     factory = ImageGenerator()
-    factory.generateMaps(FLAGS.number)
+    factory.generateMaps(FLAGS.number, FLAGS.superposition)

@@ -1,3 +1,7 @@
+import numpy as np
+import seaborn as sb
+import matplotlib.pyplot as plt
+import pandas as pd
 import os
 import sys
 
@@ -18,24 +22,22 @@ def get_const_dir():
 const = get_const_dir()
 sys.path.append(const)
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sb
-import numpy as np
-
 
 stats = [[0, 0], [0, 0]]
 
 
 # generate confusion matrix
-size = 154
+size = 155
 confusion = [[0] * 2 for i in range(size)]
 
 predictions = pd.read_csv(
-    os.path.join(get_current_dir(1), "Data", "Evaluation", "detection.csv")
+    os.path.join(get_current_dir(1), "Data",
+                 "Evaluation", "detection_deepLeague4096.csv")
 )
 
 # adapted from https://www.pyimagesearch.com/2016/11/07/intersection-over-union-iou-for-object-detection/
+
+
 def intersection_over_union(boxA, boxB):
     # determine the (x, y)-coordinates of the intersection rectangle
     xA = max(int(boxA[0]), boxB["xmin"])
@@ -46,8 +48,10 @@ def intersection_over_union(boxA, boxB):
     interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
     # compute the area of both the prediction and ground-truth
     # rectangles
-    boxAArea = (int(boxA[2]) - int(boxA[0]) + 1) * (int(boxA[3]) - int(boxA[1]) + 1)
-    boxBArea = (boxB["xmax"] - boxB["xmin"] + 1) * (boxB["ymax"] - boxB["ymin"] + 1)
+    boxAArea = (int(boxA[2]) - int(boxA[0]) + 1) * \
+        (int(boxA[3]) - int(boxA[1]) + 1)
+    boxBArea = (boxB["xmax"] - boxB["xmin"] + 1) * \
+        (boxB["ymax"] - boxB["ymin"] + 1)
     # compute the intersection over union by taking the intersection
     # area and dividing it by the sum of prediction + ground-truth
     # areas - the interesection area
@@ -57,7 +61,8 @@ def intersection_over_union(boxA, boxB):
 
 
 with open(
-    os.path.join(get_current_dir(1), "Data", "Evaluation", "data_train.txt")
+    os.path.join(get_current_dir(1), "Data", "Evaluation",
+                 "data_train_deepLeague4096.txt")
 ) as dataTrain:
     line = dataTrain.readline()
     cnt = 0
@@ -81,12 +86,14 @@ with open(
         to_rm = []
         success = False
         for index, prediction in savedPredicitions.iterrows():
+            #print(line)
             for d in line:
                 if (
                     int(d[4]) == int(prediction.label)
                     and intersection_over_union(d, prediction) > 0.5
+                    and not success
                 ):
-                    confusion[int(d[4])][0] += 1
+                    confusion[int(prediction.label)][0] += 1
                     stats[0][0] += 1
                     to_rm.append(index)
                     success = True
