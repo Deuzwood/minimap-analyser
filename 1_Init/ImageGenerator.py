@@ -239,11 +239,12 @@ class ImageGenerator:
         f.write("\n".join(self.data_train))
         f.close()
 
-    def generateMaps(self, nbMaps, superposition):
+    def generateMaps(self, nbMaps,randomgen, superposition):
         while self.mapIndex < nbMaps:
             # redAndBlue
-            self.generateMap(0)
-            self.generateMap(1)
+            if(randomgen):
+                self.generateMap(0)
+                self.generateMap(1)
             if(superposition):
                 self.generateMapSuperposition(0)
                 self.generateMapSuperposition(1)
@@ -270,7 +271,10 @@ if __name__ == "__main__":
     parser.add_argument('--no_superposition', dest='superposition', action='store_false')
     parser.set_defaults(superposition=True)
 
+    parser.add_argument('--no_randomgen', dest='randomgen', action='store_false')
+    parser.set_defaults(randomgen=True)
+
     FLAGS = parser.parse_args()
     print(FLAGS)
     factory = ImageGenerator()
-    factory.generateMaps(FLAGS.number, FLAGS.superposition)
+    factory.generateMaps(FLAGS.number, FLAGS.randomgen, FLAGS.superposition)
